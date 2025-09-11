@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Cashier System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1f2937;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background-color: #374151;
+            padding: 1rem;
+            border-bottom: 1px solid #4b5563;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: #d1d5db;
+            margin-left: auto;
+        }
+        
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+        }
+        
+        /* Main Layout */
+        .main-content {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            overflow: hidden;
+        }
+        
+        /* Left Side */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        /* Items Box */
+        .items-container {
+            background-color: #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #4b5563;
+            height: 32rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .items-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .items-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #9ca3af;
+            text-align: center;
+        }
+        
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4b5563;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .item-row:hover {
+            background-color: #7f1d1d;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: white;
+        }
+        
+        .item-price {
+            color: #d1d5db;
+            font-size: 0.875rem;
+        }
+        
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quantity-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .quantity-btn.minus {
+            background-color: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        .quantity-btn.minus:hover {
+            background-color: #991b1b;
+        }
+        
+        .quantity-btn.plus {
+            background-color: #14532d;
+            color: #86efac;
+        }
+        
+        .quantity-btn.plus:hover {
+            background-color: #166534;
+        }
+        
+        .quantity {
+            width: 2rem;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.125rem;
+        }
+        
+        .item-total {
+            font-weight: bold;
+            font-size: 1.125rem;
+            color: #60a5fa;
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        .total-section {
+            border-top: 2px solid #4b5563;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .total-amount {
+            color: #60a5fa;
+        }
+        
+        /* Sales History */
+        .sales-history {
+            background-color: #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #4b5563;
+            height: 12rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .history-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4b5563;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+        
+        .history-item:hover {
+            background-color: #1e3a8a;
+        }
+        
+        .history-total {
+            border-top: 1px solid #4b5563;
+            padding-top: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            width: 24rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        /* Calculator */
+        .calculator-container {
+            background-color: #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #4b5563;
+            height: 32rem;
+        }
+        
+        .calc-display {
+            background-color: #1f2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #4b5563;
+        }
+        
+        .calc-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calc-paid, .calc-change {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .calc-btn {
+            background-color: #4b5563;
+            border: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .calc-btn:hover {
+            background-color: #6b7280;
+        }
+        
+        .calc-btn.zero {
+            grid-column: span 2;
+        }
+        
+        .complete-sale-btn {
+            background: linear-gradient(45deg, #10b981, #059669);
+            border: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .complete-sale-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+        
+        .complete-sale-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Voice Control */
+        .voice-container {
+            background-color: #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #4b5563;
+            height: 12rem;
+        }
+        
+        .voice-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .voice-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .voice-btn {
+            background: linear-gradient(45deg, #dc2626, #b91c1c);
+            border: none;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .voice-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        }
+        
+        .voice-btn.recording {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .add-item-section {
+            margin-top: 1rem;
+        }
+        
+        .add-item-form {
+            display: none;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .add-item-form.show {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .add-item-input {
+            background-color: #4b5563;
+            border: 1px solid #6b7280;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            color: white;
+            font-size: 0.875rem;
+        }
+        
+        .add-item-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .add-item-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <h1>POS Cashier System</h1>
+                <div style="font-size: 0.875rem; color: #d1d5db; margin-top: 0.25rem;">
+                    Restaurant ID: Demo
+                </div>
+            </div>
+            <div class="header-info">
+                <div style="display: flex; align-items: center; gap: 0.25rem;">
+                    <div class="connection-dot"></div>
+                    <span>Connected</span>
+                </div>
+                <span>Sales: $<span id="totalSales">0.00</span></span>
+                <span>Orders: <span id="totalOrders">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <!-- Items Container -->
+            <div class="items-container">
+                <div class="items-header">
+                    <h2>Items</h2>
+                </div>
+                
+                <div class="items-list" id="itemsList">
+                    <div class="empty-state" id="emptyState">
+                        <p>No items added yet</p>
+                        <p style="font-size: 0.875rem; margin-top: 0.25rem;">Use voice commands or manual entry</p>
+                    </div>
+                </div>
+                
+                <div class="total-section">
+                    <span>Total:</span>
+                    <span class="total-amount" id="totalAmount">$0.00</span>
+                </div>
+            </div>
+
+            <!-- Sales History -->
+            <div class="sales-history">
+                <div class="history-header">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Sales History
+                </div>
+                
+                <div class="history-list" id="historyList">
+                    <div class="empty-state">
+                        <p style="font-size: 0.875rem;">No sales yet today</p>
+                    </div>
+                </div>
+                
+                <div class="history-total">
+                    <span>Today's Total:</span>
+                    <span style="color: #60a5fa; font-weight: bold;" id="dailyTotal">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Calculator -->
+            <div class="calculator-container">
+                <div class="calc-display">
+                    <div class="calc-amount">Amount: $<span id="calcAmount">0.00</span></div>
+                    <div class="calc-paid">Paid: $<span id="paidAmount">0.00</span></div>
+                    <div class="calc-change">Change: $<span id="changeAmount">0.00</span></div>
+                </div>
+                
+                <div class="calc-grid">
+                    <button class="calc-btn" onclick="addToPayment('1')">1</button>
+                    <button class="calc-btn" onclick="addToPayment('2')">2</button>
+                    <button class="calc-btn" onclick="addToPayment('3')">3</button>
+                    <button class="calc-btn" onclick="addToPayment('4')">4</button>
+                    <button class="calc-btn" onclick="addToPayment('5')">5</button>
+                    <button class="calc-btn" onclick="addToPayment('6')">6</button>
+                    <button class="calc-btn" onclick="addToPayment('7')">7</button>
+                    <button class="calc-btn" onclick="addToPayment('8')">8</button>
+                    <button class="calc-btn" onclick="addToPayment('9')">9</button>
+                    <button class="calc-btn zero" onclick="addToPayment('0')">0</button>
+                    <button class="calc-btn" onclick="clearPayment()">Clear</button>
+                </div>
+                
+                <button class="complete-sale-btn" id="completeSaleBtn" onclick="completeSale()">
+                    Complete Sale
+                </button>
+            </div>
+
+            <!-- Voice Control -->
+            <div class="voice-container">
+                <div class="voice-header">Voice Control</div>
+                
+                <div class="voice-controls">
+                    <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤 Start</button>
+                    <button class="voice-btn" onclick="clearAll()">🗑️ Clear</button>
+                    <button class="voice-btn" onclick="testAddItem()" style="background: #059669;">🧪 Test</button>
+                </div>
+                
+                <div class="add-item-section">
+                    <button class="btn-small btn-secondary" onclick="toggleAddForm()">+ Add Item</button>
+                    
+                    <div class="add-item-form" id="addItemForm">
+                        <input type="text" id="itemName" placeholder="Item name" class="add-item-input">
+                        <input type="number" id="itemPrice" placeholder="Price" step="0.01" class="add-item-input">
+                        <input type="number" id="itemQuantity" placeholder="Quantity" value="1" class="add-item-input">
+                        <div class="add-item-buttons">
+                            <button class="btn-small btn-primary" onclick="addCustomItem()">Add</button>
+                            <button class="btn-small btn-secondary" onclick="cancelAddItem()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="application/javascript" src="/cashier.js"></script>
+</body>
+</html>

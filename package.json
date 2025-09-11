@@ -1,0 +1,25 @@
+{
+  "name": "simple-voice-to-text",
+  "version": "1.0.0",
+  "description": "Simple voice to text app using Gemini Live API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.6",
+    "ws": "^8.18.3"
+  },
+  "keywords": [
+    "voice",
+    "transcription",
+    "gemini",
+    "live-api"
+  ],
+  "author": "",
+  "license": "ISC"
+}

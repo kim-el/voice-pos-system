@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Voice to Text</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .recording {
+            background: linear-gradient(45deg, #ff4757, #ff3838) !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            min-height: 30px;
+        }
+        
+        .transcription {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 150px;
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.8;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        
+        .connection-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .connected { background-color: #2ecc71; }
+        .disconnected { background-color: #e74c3c; }
+        .connecting { background-color: #f39c12; }
+        
+        .prompt-section {
+            margin-bottom: 30px;
+        }
+        
+        .prompt-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        #promptInput {
+            width: 100%;
+            min-height: 80px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        #promptInput:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #promptInput::placeholder {
+            color: #666;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Simple Voice to Text</h1>
+        
+        <div class="prompt-section">
+            <label for="promptInput">📝 Your Prompt:</label>
+            <textarea id="promptInput" placeholder="Enter your menu with prices, one per line:
+Pizza - $18.99
+Burger - $12.50
+Coffee - $4.25
+Fries - $5.99
+
+Then add any additional instructions..."></textarea>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn">🎤 Start Recording</button>
+            <button id="stopBtn" disabled>⏹️ Stop Recording</button>
+            <button id="clearBtn">🗑️ Clear</button>
+        </div>
+        
+        <div class="status" id="status">
+            <span class="connection-status disconnected" id="connectionStatus"></span>
+            <span id="statusText">Click "Start Recording" to begin</span>
+        </div>
+        
+        <div class="transcription" id="transcription">
+            <em>Your transcription will appear here...</em>
+        </div>
+    </div>
+
+    <script src="voice-app.js"></script>
+</body>
+</html>
