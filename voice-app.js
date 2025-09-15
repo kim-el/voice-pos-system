@@ -80,12 +80,20 @@ class SimpleVoiceToText {
                 
                 // Convert base_price to price and clean up item names
                 if (jsonOrder.items) {
-                    jsonOrder.items = jsonOrder.items.map(item => ({
-                        name: item.name.replace(/\s+/g, ' ').trim(), // Fix multiple/extra spaces
-                        quantity: item.quantity,
-                        price: item.base_price || item.price
-                    }));
-                    console.log('🔄 Converted to standard format:', jsonOrder);
+                    // Try to align item names to menu names parsed from prompt
+                    const promptText = this.promptInput ? this.promptInput.value : '';
+                    const menuItems = this.extractMenuFromPrompt(promptText);
+                    jsonOrder.items = jsonOrder.items.map(item => {
+                        const canon = this.getCanonicalMenuName(item.name, menuItems);
+                        const finalName = canon?.name || item.name.replace(/\s+/g, ' ').trim();
+                        const finalPrice = canon?.price != null ? canon.price : (item.base_price || item.price);
+                        return {
+                            name: finalName,
+                            quantity: item.quantity,
+                            price: finalPrice
+                        };
+                    });
+                    console.log('🔄 Converted to standard format with canonical names:', jsonOrder);
                 }
             } catch (error) {
                 console.error('❌ Failed to parse JSON from transcription:', error);
@@ -119,6 +127,28 @@ class SimpleVoiceToText {
         } catch (error) {
             console.error('❌ Error processing order:', error);
         }
+    }
+    
+    // Map a possibly spaced-out name (e.g., "T eh tarik") to a menu item
+    getCanonicalMenuName(rawName, menuItems) {
+        if (!rawName) return null;
+        const cleaned = String(rawName).toLowerCase().replace(/[,'`]/g, ' ').replace(/\s+/g, ' ').trim();
+        const key = cleaned.replace(/\s+/g, '');
+        // menuItems keys are lower-case canonical names
+        for (const mk of Object.keys(menuItems || {})) {
+            const mkNoSpace = mk.replace(/\s+/g, '');
+            if (mkNoSpace === key) {
+                return { name: menuItems[mk].name, price: menuItems[mk].price };
+            }
+        }
+        // Fallback: try a loose letter-spacing tolerant match
+        for (const mk of Object.keys(menuItems || {})) {
+            const pattern = new RegExp('^' + mk.split(/\s+/).map(w => w.split('').map(ch => ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*')).join('\\s+') + '$', 'i');
+            if (pattern.test(cleaned)) {
+                return { name: menuItems[mk].name, price: menuItems[mk].price };
+            }
+        }
+        return null;
     }
     
     extractMenuFromPrompt(prompt) {
